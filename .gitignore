@@ -45,4 +45,4 @@ next-env.d.ts
 .roo/mcp.json
 .cline/cline_mcp_settings.json
 .vscode/mcp.json
-
+.cursor/mcp.json
