@@ -8,7 +8,7 @@ const navItems = [
   { href: "/training",    icon: "piano",             label: "Training" },
   { href: "/melody",      icon: "music_note",        label: "Melody Mode" },
   { href: "/leaderboard", icon: "social_leaderboard", label: "Leaderboard" },
-  { href: "#",            icon: "library_music",     label: "Library" },
+  { href: "/melody/library", icon: "library_music",     label: "Library" },
 ];
 
 export default function SideNav() {
