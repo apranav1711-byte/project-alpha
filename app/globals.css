@@ -351,3 +351,37 @@ body {
 /* Activity/bar chart */
 .bar-active { background: var(--accent) !important; }
 .bar-normal { background: var(--bg-raised) !important; }
+
+/* ── Sidebar Push-Content Layout Transition ── */
+.main-layout {
+  transition: margin-left 0.3s ease-in-out !important;
+}
+
+.sub-header-layout {
+  left: 0;
+  transition: left 0.3s ease-in-out !important;
+}
+
+.top-nav-layout {
+  left: 0 !important;
+  width: 100% !important;
+  transition: none !important;
+}
+
+@media (min-width: 768px) {
+  .main-layout {
+    margin-left: 68px !important;
+  }
+  
+  html[data-sidebar-expanded="true"] .main-layout {
+    margin-left: 256px !important;
+  }
+
+  .sub-header-layout {
+    left: 68px !important;
+  }
+  
+  html[data-sidebar-expanded="true"] .sub-header-layout {
+    left: 256px !important;
+  }
+}

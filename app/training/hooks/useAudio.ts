@@ -108,6 +108,27 @@ export function useAudio() {
     [ensureStarted]
   );
 
+  // ── Play a piano chord (polyphonic playback) ──────────────────────────────
+  const playChord = useCallback(
+    async (notes: { note: NoteName; octave?: number }[]) => {
+      const ok = await ensureStarted();
+      if (!ok) return;
+      const { sampler, samplerLoaded } = refs.current;
+      if (!sampler || !samplerLoaded) return;
+      try {
+        const noteStrings = notes.map((n) => {
+          const sharpNote = ENHARMONIC_MAP[n.note] || n.note;
+          const oct = n.octave !== undefined ? n.octave : 4;
+          return `${sharpNote}${oct}`;
+        });
+        sampler.triggerAttackRelease(noteStrings, "2n");
+      } catch {
+        /* ignore overlap errors */
+      }
+    },
+    [ensureStarted]
+  );
+
   // ── Success chime (ascending triad) ───────────────────────────────────────
   const playSuccess = useCallback(async () => {
     if (!(await ensureStarted())) return;
@@ -133,13 +154,14 @@ export function useAudio() {
 
   // Synchronous-signature wrapper for callbacks that can't await
   const playNoteSync = useCallback(
-    (note: NoteName) => void playNote(note),
+    (note: NoteName, octave = 4) => void playNote(note, octave),
     [playNote]
   );
 
   return {
     /** Play any piano note — call this for EVERY key press, always */
     playNote: playNoteSync,
+    playChord,
     playSuccess,
     playError,
     /** True once Salamander samples are downloaded and decoded */

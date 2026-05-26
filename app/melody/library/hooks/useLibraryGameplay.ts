@@ -3,6 +3,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import type { SongMetadata, ParsedMidiNote, LibraryPhase, LibraryNoteAttempt, LibraryRoundResult, LibraryRecentHistory } from "../types";
 import type { NoteName } from "../../../training/types";
 import { PRELOADED_SONGS } from "../data/songs";
+import { getLibraryHistoryKey } from "../../../profile/utils/userState";
 
 export interface GameplayState {
   phase: LibraryPhase;
@@ -62,7 +63,8 @@ export function useLibraryGameplay() {
     try {
       const savedUnlocks = localStorage.getItem("alpha-library-unlocks");
       const savedFavs = localStorage.getItem("alpha-library-favorites");
-      const savedHistory = localStorage.getItem("alpha-library-history");
+      const libraryKey = getLibraryHistoryKey();
+      const savedHistory = localStorage.getItem(libraryKey);
 
       setState((prev) => ({
         ...prev,
@@ -309,8 +311,23 @@ export function useLibraryGameplay() {
         score: newScore,
       };
 
+      const libraryKey = getLibraryHistoryKey();
       const nextHistory = [historyItem, ...s.recentHistory.slice(0, 9)];
-      saveToStorage("alpha-library-history", nextHistory);
+      saveToStorage(libraryKey, nextHistory);
+
+      // Add XP reward for completing a song in the library
+      try {
+        let xpReward = Math.round(accuracy * 1.5 + newScore / 100);
+        if (accuracy >= 90) xpReward += 150; // excellence bonus
+        else if (accuracy >= 70) xpReward += 50; // pass bonus
+        xpReward = Math.max(20, xpReward); // minimum 20 XP for effort
+        
+        import("../../../profile/utils/userState").then(({ addXP }) => {
+          addXP(xpReward);
+        });
+      } catch (err) {
+        console.error("Failed to add XP on melody completion:", err);
+      }
 
       setState((prev) => ({
         ...prev,

@@ -3,6 +3,7 @@
 import { useState, useCallback, useMemo, useRef } from "react";
 import Link from "next/link";
 import SideNav from "../components/SideNav";
+import TopNav from "../components/TopNav";
 import { useAudio } from "./hooks/useAudio";
 import { useKeyboard } from "./hooks/useKeyboard";
 import { useGameEngine } from "./hooks/useGameEngine";
@@ -112,33 +113,34 @@ export default function Training() {
 
   return (
     <>
+      <TopNav />
       <SideNav />
       <div
-        className="md:ml-64 min-h-screen flex flex-col"
-        style={{ background: "#232323", color: "#d1d0c5" }}
+        className="main-layout min-h-screen flex flex-col"
+        style={{ background: "var(--bg)", color: "var(--text)" }}
       >
         {/* ── Top bar ── */}
         <header
-          className="fixed top-0 left-0 md:left-64 right-0 z-40 flex items-center justify-between px-6 h-12"
-          style={{ background: "#232323", borderBottom: "1px solid #2c2c2c" }}
+          className="sub-header-layout fixed top-14 right-0 z-40 flex items-center justify-between px-6 h-12"
+          style={{ background: "var(--bg)", borderBottom: "1px solid var(--bg-border)" }}
         >
           <div className="flex items-center gap-4">
             <Link
               href="/dashboard"
-              style={{ color: "#646669", display: "flex", alignItems: "center", transition: "color 0.15s" }}
-              onMouseEnter={e => (e.currentTarget.style.color = "#d1d0c5")}
-              onMouseLeave={e => (e.currentTarget.style.color = "#646669")}
+              style={{ color: "var(--text-sub)", display: "flex", alignItems: "center", transition: "color 0.15s" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "var(--text)")}
+              onMouseLeave={e => (e.currentTarget.style.color = "var(--text-sub)")}
             >
               <span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_back</span>
             </Link>
-            <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 13, color: "#646669" }}>
+            <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 13, color: "var(--text-sub)" }}>
               ear trainer
             </span>
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             {!isLoaded && (
-              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "#646669" }}>
+              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "var(--text-sub)" }}>
                 loading…
               </span>
             )}
@@ -148,7 +150,7 @@ export default function Training() {
                 style={{
                   fontFamily: "'JetBrains Mono', monospace",
                   fontSize: 11,
-                  color: blindMode ? "#e2b714" : "#646669",
+                  color: blindMode ? "var(--accent)" : "var(--text-sub)",
                   background: "none",
                   border: "none",
                   cursor: "pointer",
@@ -165,14 +167,14 @@ export default function Training() {
                 style={{
                   fontFamily: "'JetBrains Mono', monospace",
                   fontSize: 11,
-                  color: "#646669",
+                  color: "var(--text-sub)",
                   background: "none",
                   border: "none",
                   cursor: "pointer",
                   transition: "color 0.15s",
                 }}
-                onMouseEnter={e => (e.currentTarget.style.color = "#d1d0c5")}
-                onMouseLeave={e => (e.currentTarget.style.color = "#646669")}
+                onMouseEnter={e => (e.currentTarget.style.color = "var(--text)")}
+                onMouseLeave={e => (e.currentTarget.style.color = "var(--text-sub)")}
               >
                 reset
               </button>
@@ -182,7 +184,7 @@ export default function Training() {
 
         {/* ── Main ── */}
         <main
-          className="flex-1 flex flex-col items-center justify-center pt-12 px-4 pb-6"
+          className="flex-1 flex flex-col items-center justify-center pt-28 px-4 pb-6"
           style={{ minHeight: "100vh" }}
         >
 
@@ -201,7 +203,7 @@ export default function Training() {
                   style={{
                     fontFamily: "'JetBrains Mono', monospace",
                     fontSize: 13,
-                    color: "#646669",
+                    color: "var(--text-sub)",
                     letterSpacing: "0.1em",
                     textTransform: "lowercase",
                     marginBottom: 8,
@@ -214,7 +216,7 @@ export default function Training() {
                     fontFamily: "'JetBrains Mono', monospace",
                     fontSize: 32,
                     fontWeight: 700,
-                    color: "#e2b714",
+                    color: "var(--accent)",
                     letterSpacing: "-0.02em",
                     lineHeight: 1,
                   }}
@@ -279,7 +281,7 @@ export default function Training() {
                   textAlign: "center",
                   fontFamily: "'JetBrains Mono', monospace",
                   fontSize: 12,
-                  color: "#646669",
+                  color: "var(--text-sub)",
                   lineHeight: 1.8,
                 }}
               >
@@ -288,7 +290,7 @@ export default function Training() {
                     press{" "}
                     <span
                       onClick={start}
-                      style={{ color: "#e2b714", cursor: "pointer", borderBottom: "1px solid #e2b71440" }}
+                      style={{ color: "var(--accent)", cursor: "pointer", borderBottom: "1px solid var(--accent-sub)" }}
                     >
                       tab
                     </span>
@@ -298,12 +300,12 @@ export default function Training() {
                       style={{
                         fontFamily: "'JetBrains Mono', monospace",
                         fontSize: 12,
-                        color: "#e2b714",
+                        color: "var(--accent)",
                         background: "none",
                         border: "none",
                         cursor: "pointer",
                         padding: 0,
-                        borderBottom: "1px solid #e2b71440",
+                        borderBottom: "1px solid var(--accent-sub)",
                       }}
                     >
                       start
@@ -311,7 +313,7 @@ export default function Training() {
                     {" "}to begin
                   </>
                 ) : (
-                  <span style={{ color: "#646669" }}>loading audio samples…</span>
+                  <span style={{ color: "var(--text-muted)" }}>loading audio samples…</span>
                 )}
               </div>
 
@@ -323,8 +325,8 @@ export default function Training() {
                     marginTop: 16,
                     width: "100%",
                     padding: "14px",
-                    background: "#e2b714",
-                    color: "#232323",
+                    background: "var(--accent)",
+                    color: "var(--bg)",
                     fontFamily: "'JetBrains Mono', monospace",
                     fontSize: 13,
                     fontWeight: 700,
@@ -346,19 +348,19 @@ export default function Training() {
                 style={{
                   marginTop: 28,
                   padding: "12px 16px",
-                  background: "#2c2c2c",
+                  background: "var(--bg-surface)",
                   borderRadius: 8,
                   fontFamily: "'JetBrains Mono', monospace",
                   fontSize: 10,
-                  color: "#646669",
+                  color: "var(--text-sub)",
                   lineHeight: 1.9,
                 }}
               >
-                <span style={{ color: "#d1d0c5" }}>white keys:</span> A S D F G H J
+                <span style={{ color: "var(--text)" }}>white keys:</span> A S D F G H J
                 &nbsp;&nbsp;
-                <span style={{ color: "#d1d0c5" }}>black keys:</span> W E T Y U
+                <span style={{ color: "var(--text)" }}>black keys:</span> W E T Y U
                 &nbsp;&nbsp;
-                <span style={{ color: "#d1d0c5" }}>replay:</span> R
+                <span style={{ color: "var(--text)" }}>replay:</span> R
               </div>
             </div>
           )}
@@ -397,7 +399,7 @@ export default function Training() {
                 style={{
                   width: "100%",
                   height: 3,
-                  background: "#2c2c2c",
+                  background: "var(--bg-surface)",
                   borderRadius: 2,
                   marginBottom: 40,
                   overflow: "hidden",
@@ -445,16 +447,16 @@ export default function Training() {
                   marginTop: 14,
                   fontFamily: "'JetBrains Mono', monospace",
                   fontSize: 10,
-                  color: "#646669",
+                  color: "var(--text-muted)",
                   display: "flex",
                   gap: 20,
                   flexWrap: "wrap",
                   justifyContent: "center",
                 }}
               >
-                <span><span style={{ color: "#d1d0c5" }}>white:</span> A S D F G H J</span>
-                <span><span style={{ color: "#d1d0c5" }}>black:</span> W E T Y U</span>
-                <span><span style={{ color: "#e2b714" }}>replay:</span> R</span>
+                <span><span style={{ color: "var(--text)" }}>white:</span> A S D F G H J</span>
+                <span><span style={{ color: "var(--text)" }}>black:</span> W E T Y U</span>
+                <span><span style={{ color: "var(--accent)" }}>replay:</span> R</span>
               </div>
             </div>
           )}
@@ -486,7 +488,7 @@ function ConfigRow({ label, children }: { label: string; children: React.ReactNo
         style={{
           fontFamily: "'JetBrains Mono', monospace",
           fontSize: 11,
-          color: "#646669",
+          color: "var(--text-muted)",
           minWidth: 56,
           flexShrink: 0,
         }}
@@ -516,17 +518,17 @@ function MtChip({
         fontFamily: "'JetBrains Mono', monospace",
         fontSize: 12,
         fontWeight: active ? 700 : 400,
-        color: active ? "#e2b714" : "#646669",
-        background: active ? "#2c2c2c" : "transparent",
+        color: active ? "var(--accent)" : "var(--text-sub)",
+        background: active ? "var(--bg-raised)" : "transparent",
         border: "none",
         borderRadius: 4,
         padding: "4px 10px",
         cursor: "pointer",
         transition: "color 0.15s, background 0.15s",
-        outline: active ? "1px solid #e2b71430" : "none",
+        outline: active ? "1px solid var(--accent-sub)" : "none",
       }}
-      onMouseEnter={e => { if (!active) e.currentTarget.style.color = "#d1d0c5"; }}
-      onMouseLeave={e => { if (!active) e.currentTarget.style.color = "#646669"; }}
+      onMouseEnter={e => { if (!active) e.currentTarget.style.color = "var(--text)"; }}
+      onMouseLeave={e => { if (!active) e.currentTarget.style.color = "var(--text-sub)"; }}
     >
       {children}
     </button>
@@ -552,7 +554,7 @@ function MtStat({
         style={{
           fontFamily: "'JetBrains Mono', monospace",
           fontSize: 10,
-          color: "#646669",
+          color: "var(--text-muted)",
           letterSpacing: "0.08em",
           textTransform: "lowercase",
         }}
@@ -564,7 +566,7 @@ function MtStat({
           fontFamily: "'JetBrains Mono', monospace",
           fontSize: 20,
           fontWeight: 700,
-          color: color ?? (highlight ? "#e2b714" : "#d1d0c5"),
+          color: color ?? (highlight ? "var(--accent)" : "var(--text)"),
           letterSpacing: "-0.02em",
           transition: "color 0.3s",
           animation: pulse ? "timerPulse 0.8s ease infinite" : "none",

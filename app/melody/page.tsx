@@ -194,7 +194,7 @@ export default function MelodyModePage() {
       )}
 
       <main
-        className="md:ml-64"
+        className="main-layout"
         style={{
           paddingTop: 72,
           paddingBottom: 48,

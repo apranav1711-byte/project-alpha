@@ -250,29 +250,62 @@ export default function GameplayView({
 
             {/* Scrolling note bubbles in Learn Mode */}
             {showNotes && (
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "center", padding: "12px 18px", background: "var(--bg-surface)", border: "1px solid var(--bg-border)", borderRadius: 10, maxWidth: "100%", maxHeight: 100, overflowY: "auto", animation: "fadeInUp 0.25s ease", marginTop: 20 }}>
-                {activeNotes.map((n, i) => {
-                  const isCurrent = i === activePreviewNoteIdx;
-                  const isPlayed = activePreviewNoteIdx !== null && i < activePreviewNoteIdx;
-                  return (
-                    <span
-                      key={i}
-                      style={{
-                        fontFamily: "'JetBrains Mono', monospace",
-                        fontSize: 11,
-                        padding: "4px 8px",
-                        background: isCurrent ? "var(--accent)" : isPlayed ? "rgba(255,255,255,0.03)" : "var(--bg-raised)",
-                        color: isCurrent ? "var(--bg)" : isPlayed ? "var(--text-muted)" : "var(--text-sub)",
-                        border: `1px solid ${isCurrent ? "var(--accent)" : "var(--bg-border)"}`,
-                        borderRadius: 6,
-                        fontWeight: isCurrent ? "bold" : "normal",
-                        transition: "all 0.15s",
-                      }}
-                    >
-                      {n.note}
-                    </span>
-                  );
-                })}
+              <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 20 }}>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "center", padding: "12px 18px", background: "var(--bg-surface)", border: "1px solid var(--bg-border)", borderRadius: 10, maxWidth: "100%", maxHeight: 100, overflowY: "auto", animation: "fadeInUp 0.25s ease" }}>
+                  {activeNotes.map((n, i) => {
+                    const isCurrent = i === activePreviewNoteIdx;
+                    const isPlayed = activePreviewNoteIdx !== null && i < activePreviewNoteIdx;
+                    const isRight = n.hand === "right";
+                    let bg = "var(--bg-raised)";
+                    let color = "var(--text-sub)";
+                    let border = "1px solid var(--bg-border)";
+                    
+                    if (isCurrent) {
+                      bg = isRight ? "#5ba4cf" : "#ff7a50";
+                      color = "var(--bg)";
+                      border = `1px solid ${isRight ? "#5ba4cf" : "#ff7a50"}`;
+                    } else if (isPlayed) {
+                      bg = isRight ? "rgba(91, 164, 207, 0.03)" : "rgba(255, 122, 80, 0.03)";
+                      color = isRight ? "rgba(91, 164, 207, 0.3)" : "rgba(255, 122, 80, 0.3)";
+                      border = `1px solid ${isRight ? "rgba(91, 164, 207, 0.1)" : "rgba(255, 122, 80, 0.1)"}`;
+                    } else {
+                      bg = isRight ? "rgba(91, 164, 207, 0.08)" : "rgba(255, 122, 80, 0.08)";
+                      color = isRight ? "#5ba4cf" : "#ff7a50";
+                      border = `1px solid ${isRight ? "rgba(91, 164, 207, 0.2)" : "rgba(255, 122, 80, 0.2)"}`;
+                    }
+
+                    return (
+                      <span
+                        key={i}
+                        style={{
+                          fontFamily: "'JetBrains Mono', monospace",
+                          fontSize: 11,
+                          padding: "4px 8px",
+                          background: bg,
+                          color,
+                          border,
+                          borderRadius: 6,
+                          fontWeight: isCurrent ? "bold" : "normal",
+                          transition: "all 0.15s",
+                        }}
+                      >
+                        {n.note}
+                      </span>
+                    );
+                  })}
+                </div>
+                {practiceHand === "both" && (
+                  <div style={{ display: "flex", justifyContent: "center", gap: 16, fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: "var(--text-muted)", animation: "fadeInUp 0.25s ease" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#5ba4cf" }} />
+                      <span>Right Hand (Treble)</span>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#ff7a50" }} />
+                      <span>Left Hand (Bass)</span>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -310,29 +343,62 @@ export default function GameplayView({
 
             {/* Scrolling note bubbles in Learn Mode */}
             {showNotes && (
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "center", padding: "12px 18px", background: "var(--bg-surface)", border: "1px solid var(--bg-border)", borderRadius: 10, maxWidth: "100%", maxHeight: 100, overflowY: "auto", animation: "fadeInUp 0.25s ease", marginTop: 20 }}>
-                {activeNotes.map((n, i) => {
-                  const isCurrent = i === inputIndex;
-                  const isPlayed = i < inputIndex;
-                  return (
-                    <span
-                      key={i}
-                      style={{
-                        fontFamily: "'JetBrains Mono', monospace",
-                        fontSize: 11,
-                        padding: "4px 8px",
-                        background: isCurrent ? "var(--accent)" : isPlayed ? "rgba(255,255,255,0.03)" : "var(--bg-raised)",
-                        color: isCurrent ? "var(--bg)" : isPlayed ? "var(--text-muted)" : "var(--text-sub)",
-                        border: `1px solid ${isCurrent ? "var(--accent)" : "var(--bg-border)"}`,
-                        borderRadius: 6,
-                        fontWeight: isCurrent ? "bold" : "normal",
-                        transition: "all 0.15s",
-                      }}
-                    >
-                      {n.note}
-                    </span>
-                  );
-                })}
+              <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 20 }}>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "center", padding: "12px 18px", background: "var(--bg-surface)", border: "1px solid var(--bg-border)", borderRadius: 10, maxWidth: "100%", maxHeight: 100, overflowY: "auto", animation: "fadeInUp 0.25s ease" }}>
+                  {activeNotes.map((n, i) => {
+                    const isCurrent = i === inputIndex;
+                    const isPlayed = i < inputIndex;
+                    const isRight = n.hand === "right";
+                    let bg = "var(--bg-raised)";
+                    let color = "var(--text-sub)";
+                    let border = "1px solid var(--bg-border)";
+                    
+                    if (isCurrent) {
+                      bg = isRight ? "#5ba4cf" : "#ff7a50";
+                      color = "var(--bg)";
+                      border = `1px solid ${isRight ? "#5ba4cf" : "#ff7a50"}`;
+                    } else if (isPlayed) {
+                      bg = isRight ? "rgba(91, 164, 207, 0.03)" : "rgba(255, 122, 80, 0.03)";
+                      color = isRight ? "rgba(91, 164, 207, 0.3)" : "rgba(255, 122, 80, 0.3)";
+                      border = `1px solid ${isRight ? "rgba(91, 164, 207, 0.1)" : "rgba(255, 122, 80, 0.1)"}`;
+                    } else {
+                      bg = isRight ? "rgba(91, 164, 207, 0.08)" : "rgba(255, 122, 80, 0.08)";
+                      color = isRight ? "#5ba4cf" : "#ff7a50";
+                      border = `1px solid ${isRight ? "rgba(91, 164, 207, 0.2)" : "rgba(255, 122, 80, 0.2)"}`;
+                    }
+
+                    return (
+                      <span
+                        key={i}
+                        style={{
+                          fontFamily: "'JetBrains Mono', monospace",
+                          fontSize: 11,
+                          padding: "4px 8px",
+                          background: bg,
+                          color,
+                          border,
+                          borderRadius: 6,
+                          fontWeight: isCurrent ? "bold" : "normal",
+                          transition: "all 0.15s",
+                        }}
+                      >
+                        {n.note}
+                      </span>
+                    );
+                  })}
+                </div>
+                {practiceHand === "both" && (
+                  <div style={{ display: "flex", justifyContent: "center", gap: 16, fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: "var(--text-muted)", animation: "fadeInUp 0.25s ease" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#5ba4cf" }} />
+                      <span>Right Hand (Treble)</span>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#ff7a50" }} />
+                      <span>Left Hand (Bass)</span>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

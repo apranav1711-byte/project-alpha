@@ -57,15 +57,15 @@ function getWhiteStyle(
   const isGuessed = lastGuess ? ENHARMONIC_MAP[lastGuess] === ENHARMONIC_MAP[note] : false;
   const isCorrect = correctNote ? ENHARMONIC_MAP[correctNote] === ENHARMONIC_MAP[note] : false;
 
-  if (kbActive) return { background: "#e2b714", color: "#232323", transform: "translateY(2px)" };
+  if (kbActive) return { background: "var(--accent)", color: "var(--bg)", transform: "translateY(2px)" };
 
   if (feedback) {
     if (isGuessed && feedback === "correct")
-      return { background: "#4ade80", color: "#14532d", transform: "translateY(2px)" };
+      return { background: "var(--correct)", color: "var(--bg)", transform: "translateY(2px)" };
     if (isGuessed && feedback === "wrong")
-      return { background: "#ca4754", color: "#fff" };
+      return { background: "var(--wrong)", color: "#fff" };
     if (!isGuessed && isCorrect && feedback === "wrong")
-      return { background: "#4ade80", color: "#14532d" };
+      return { background: "var(--correct)", color: "var(--bg)" };
   }
   return {};
 }
@@ -80,15 +80,15 @@ function getBlackStyle(
   const isGuessed = lastGuess ? ENHARMONIC_MAP[lastGuess] === ENHARMONIC_MAP[note] : false;
   const isCorrect = correctNote ? ENHARMONIC_MAP[correctNote] === ENHARMONIC_MAP[note] : false;
 
-  if (kbActive) return { background: "#e2b714", color: "#232323", transform: "translateY(2px)" };
+  if (kbActive) return { background: "var(--accent)", color: "var(--bg)", transform: "translateY(2px)" };
 
   if (feedback) {
     if (isGuessed && feedback === "correct")
-      return { background: "#4ade80", color: "#14532d", transform: "translateY(2px)" };
+      return { background: "var(--correct)", color: "var(--bg)", transform: "translateY(2px)" };
     if (isGuessed && feedback === "wrong")
-      return { background: "#ca4754", color: "#fff" };
+      return { background: "var(--wrong)", color: "#fff" };
     if (!isGuessed && isCorrect && feedback === "wrong")
-      return { background: "#4ade80", color: "#14532d" };
+      return { background: "var(--correct)", color: "var(--bg)" };
   }
   return {};
 }
@@ -117,7 +117,7 @@ export function PianoKeyboard({
         userSelect: "none",
         borderRadius: 8,
         overflow: "hidden",
-        border: "1px solid #2c2c2c",
+        border: "1px solid var(--bg-border)",
         boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
       }}
     >
@@ -137,7 +137,7 @@ export function PianoKeyboard({
                 flex: 1,
                 height: "100%",
                 background: "#e8e8e8",
-                color: "#646669",
+                color: "var(--text-sub)",
                 borderRight: "1px solid #c0c0c0",
                 borderBottom: "none",
                 borderTop: "none",
@@ -182,7 +182,7 @@ export function PianoKeyboard({
               width: "7.5%",
               height: "60%",
               background: "#1a1a1a",
-              color: "#646669",
+              color: "var(--text-sub)",
               border: "none",
               borderBottomLeftRadius: 5,
               borderBottomRightRadius: 5,

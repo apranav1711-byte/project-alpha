@@ -5,6 +5,7 @@ import {
   type NoteName, type GameState, type GameConfig,
   type FeedbackKind, type HistoryEntry,
 } from "../types";
+import { getTrainingHistoryKey } from "../../profile/utils/userState";
 
 // ─── Actions ─────────────────────────────────────────────────────────────────
 
@@ -131,6 +132,7 @@ export function useGameEngine(
   const recentRef = useRef<NoteName[]>([]);
   const callbacksRef = useRef(callbacks);
   callbacksRef.current = callbacks; // always up-to-date without re-subscribing
+  const hasLoggedRef = useRef(false);
 
   const clearAll = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -147,6 +149,7 @@ export function useGameEngine(
   const start = useCallback(() => {
     clearAll();
     recentRef.current = [];
+    hasLoggedRef.current = false;
     const note = spawnNote();
     dispatch({ type: "START", note });
     callbacksRef.current.onPlayNote(note);
@@ -182,15 +185,51 @@ export function useGameEngine(
   const reset = useCallback(() => {
     clearAll();
     recentRef.current = [];
+    hasLoggedRef.current = false;
     dispatch({ type: "RESET" });
   }, [clearAll]);
 
-  // Auto-stop timer when game ends
+  // Auto-stop timer and log session details/XP when game ends
   useEffect(() => {
     if (state.phase === "ended") {
       if (timerRef.current) clearInterval(timerRef.current);
+
+      if (!hasLoggedRef.current) {
+        hasLoggedRef.current = true;
+        try {
+          const acc = state.totalAttempts > 0 ? Math.round((state.correctAttempts / state.totalAttempts) * 100) : 0;
+          const historyItem = {
+            playedAt: Date.now(),
+            score: state.score,
+            accuracy: acc,
+            maxCombo: state.maxCombo,
+            totalAttempts: state.totalAttempts,
+            correctAttempts: state.correctAttempts,
+          };
+          const trainingKey = getTrainingHistoryKey();
+          const trSaved = localStorage.getItem(trainingKey);
+          const recentHistory = trSaved ? JSON.parse(trSaved) : [];
+          const nextHistory = [historyItem, ...recentHistory.slice(0, 9)];
+          localStorage.setItem(trainingKey, JSON.stringify(nextHistory));
+
+          // XP reward: score / 2 + accuracy bonus
+          let xpReward = Math.round(state.score / 2);
+          if (acc >= 85 && state.totalAttempts >= 5) {
+            xpReward += 100;
+          } else if (acc >= 60 && state.totalAttempts >= 5) {
+            xpReward += 30;
+          }
+          xpReward = Math.max(10, xpReward); // minimum 10 XP for completing a test
+
+          import("../../profile/utils/userState").then(({ addXP }) => {
+            addXP(xpReward);
+          });
+        } catch (err) {
+          console.error("Failed to log training session:", err);
+        }
+      }
     }
-  }, [state.phase]);
+  }, [state.phase, state.score, state.maxCombo, state.totalAttempts, state.correctAttempts, clearAll]);
 
   // Cleanup on unmount
   useEffect(() => () => clearAll(), [clearAll]);

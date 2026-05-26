@@ -1,22 +1,56 @@
 "use client";
+import React, { useState, useEffect } from "react";
 import SideNav from "../components/SideNav";
 import TopNav from "../components/TopNav";
 import Link from "next/link";
+import { useUserProfile } from "../profile/utils/userState";
 
 const ACTIVITY = [
   { day: "Mon", h: 40 }, { day: "Tue", h: 65 }, { day: "Wed", h: 85, active: true },
   { day: "Thu", h: 50 }, { day: "Fri", h: 90 }, { day: "Sat", h: 30 }, { day: "Sun", h: 10 },
 ];
 
-const SKILLS = [
-  { label: "Pitch",     pct: 92 },
-  { label: "Chords",   pct: 74 },
-  { label: "Intervals", pct: 68 },
-  { label: "Rhythm",   pct: 83 },
-  { label: "Memory",   pct: 57 },
-];
-
 export default function Dashboard() {
+  const profile = useUserProfile();
+  const [pitchAcc, setPitchAcc] = useState(92);
+  const [chordsAcc, setChordsAcc] = useState(74);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const email = localStorage.getItem("alpha-last-active-email");
+      const trainingKey = email ? `alpha-training-history-${email}` : "alpha-training-history";
+      
+      try {
+        const trSaved = localStorage.getItem(trainingKey);
+        if (trSaved) {
+          const parsed = JSON.parse(trSaved);
+          
+          // Calculate chords trainer accuracy (from sessions titled "Chords Quiz")
+          const chordSessions = parsed.filter((s: any) => s.title === "Chords Quiz");
+          if (chordSessions.length > 0) {
+            const sum = chordSessions.reduce((s: number, session: any) => s + session.accuracy, 0);
+            setChordsAcc(Math.round(sum / chordSessions.length));
+          }
+
+          // Calculate standard pitch interval training accuracy
+          const pitchSessions = parsed.filter((s: any) => s.title !== "Chords Quiz");
+          if (pitchSessions.length > 0) {
+            const sum = pitchSessions.reduce((s: number, session: any) => s + session.accuracy, 0);
+            setPitchAcc(Math.round(sum / pitchSessions.length));
+          }
+        }
+      } catch {}
+    }
+  }, []);
+
+  const skills = [
+    { label: "Pitch",     pct: pitchAcc },
+    { label: "Chords",   pct: chordsAcc },
+    { label: "Intervals", pct: 68 },
+    { label: "Rhythm",   pct: 83 },
+    { label: "Memory",   pct: 57 },
+  ];
+
   return (
     <>
       <TopNav />
@@ -24,13 +58,12 @@ export default function Dashboard() {
 
       <main
         style={{
-          marginLeft: 256,
           paddingTop: 56,
           minHeight: "100vh",
           background: "var(--bg)",
           padding: "72px 40px 48px",
         }}
-        className="md:ml-64"
+        className="main-layout"
       >
         {/* ── Welcome ── */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 36, flexWrap: "wrap", gap: 16 }}>
@@ -45,7 +78,7 @@ export default function Dashboard() {
                 marginBottom: 6,
               }}
             >
-              Welcome back, Alex.
+              Welcome back, {profile.username}.
             </h2>
             <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 14, color: "var(--text-muted)" }}>
               Your pitch accuracy is in the top 2% this week.
@@ -94,64 +127,123 @@ export default function Dashboard() {
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 20 }}>
               <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-                <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 64, fontWeight: 700, color: "var(--text)", lineHeight: 1, letterSpacing: "-0.04em" }}>42</span>
-                <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 22, color: "var(--text-muted)" }}>/ 50</span>
+                <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 64, fontWeight: 700, color: "var(--text)", lineHeight: 1, letterSpacing: "-0.04em" }}>{profile.level}</span>
+                <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 22, color: "var(--text-muted)" }}>/ {profile.level + 1}</span>
               </div>
               <div style={{ textAlign: "right" }}>
-                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 18, fontWeight: 700, color: "var(--text)", marginBottom: 4 }}>98% accuracy</div>
-                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 12, color: "var(--text-muted)" }}>2,450 XP to next rank</div>
+                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 18, fontWeight: 700, color: "var(--text)", marginBottom: 4 }}>
+                  {Math.round((pitchAcc + chordsAcc) / 2)}% accuracy
+                </div>
+                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 12, color: "var(--text-muted)" }}>
+                  {(profile.level * 1000 - profile.xp).toLocaleString()} XP to next level
+                </div>
               </div>
             </div>
             {/* XP bar */}
             <div style={{ height: 8, background: "var(--bg-raised)", borderRadius: 4, overflow: "hidden" }}>
-              <div style={{ height: "100%", width: "78%", background: "var(--accent)", borderRadius: 4, transition: "width 0.5s ease" }} />
+              <div
+                style={{
+                  height: "100%",
+                  width: `${(profile.xp / (profile.level * 1000)) * 100}%`,
+                  background: "var(--accent)",
+                  borderRadius: 4,
+                  transition: "width 0.5s ease",
+                }}
+              />
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
-              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "var(--text-muted)" }}>Lvl 42</span>
-              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "var(--text-muted)" }}>Lvl 43</span>
+              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "var(--text-muted)" }}>Lvl {profile.level}</span>
+              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "var(--text-muted)" }}>Lvl {profile.level + 1}</span>
             </div>
           </div>
 
           {/* Quick Play — 4 cols */}
-          <Link
-            href="/training"
+          <div
             style={{
               gridColumn: "span 4",
-              background: "var(--bg-surface)",
-              border: "1px solid var(--bg-border)",
-              borderRadius: 12,
-              padding: 28,
               display: "flex",
               flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              textAlign: "center",
-              cursor: "pointer",
-              textDecoration: "none",
-              transition: "border-color 0.2s, transform 0.2s",
+              gap: 16,
             }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--bg-border)"; e.currentTarget.style.transform = "translateY(0)"; }}
           >
-            <div
+            {/* Link 1: Pitch Ear Trainer */}
+            <Link
+              href="/training"
               style={{
-                width: 56,
-                height: 56,
-                borderRadius: "50%",
-                background: "var(--accent-sub)",
+                flex: 1,
+                background: "var(--bg-surface)",
+                border: "1px solid var(--bg-border)",
+                borderRadius: 12,
+                padding: "20px 24px",
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center",
-                marginBottom: 16,
+                gap: 16,
+                cursor: "pointer",
+                textDecoration: "none",
+                transition: "border-color 0.2s, transform 0.2s",
               }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--bg-border)"; e.currentTarget.style.transform = "translateY(0)"; }}
             >
-              <span className="material-symbols-outlined" style={{ fontSize: 28, color: "var(--accent)" }}>play_arrow</span>
-            </div>
-            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 18, fontWeight: 700, color: "var(--text)", marginBottom: 8 }}>Quick Play</div>
-            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 13, color: "var(--text-sub)", lineHeight: 1.6 }}>
-              Jump into a session based on your weak points.
-            </div>
-          </Link>
+              <div
+                style={{
+                  width: 42,
+                  height: 42,
+                  borderRadius: "50%",
+                  background: "var(--accent-sub)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: 22, color: "var(--accent)" }}>piano</span>
+              </div>
+              <div>
+                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: 700, color: "var(--text)" }}>Pitch Trainer</div>
+                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Interval ear training quiz</div>
+              </div>
+            </Link>
+
+            {/* Link 2: Chords Trainer */}
+            <Link
+              href="/training/chords"
+              style={{
+                flex: 1,
+                background: "var(--bg-surface)",
+                border: "1px solid var(--bg-border)",
+                borderRadius: 12,
+                padding: "20px 24px",
+                display: "flex",
+                alignItems: "center",
+                gap: 16,
+                cursor: "pointer",
+                textDecoration: "none",
+                transition: "border-color 0.2s, transform 0.2s",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--purple)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--bg-border)"; e.currentTarget.style.transform = "translateY(0)"; }}
+            >
+              <div
+                style={{
+                  width: 42,
+                  height: 42,
+                  borderRadius: "50%",
+                  background: "rgba(168, 85, 247, 0.15)", // purple sub
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: 22, color: "var(--purple)" }}>graphic_eq</span>
+              </div>
+              <div>
+                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: 700, color: "var(--text)" }}>Chords Trainer</div>
+                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Triads & 7th chords reference</div>
+              </div>
+            </Link>
+          </div>
 
           {/* Skill Breakdown — 5 cols */}
           <div
@@ -167,7 +259,7 @@ export default function Dashboard() {
               Skill Analysis
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              {SKILLS.map(s => (
+              {skills.map(s => (
                 <div key={s.label}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
                     <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 13, color: "var(--text-sub)" }}>{s.label}</span>

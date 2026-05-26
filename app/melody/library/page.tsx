@@ -101,7 +101,7 @@ export default function MelodyLibraryPage() {
       <SideNav />
 
       <main
-        className="md:ml-64"
+        className="main-layout"
         style={{
           paddingTop: 72,
           paddingBottom: 48,

@@ -2,11 +2,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme, THEMES } from "./ThemeProvider";
+import { useUserProfile } from "../profile/utils/userState";
 
 const navLinks = [
-  { href: "/dashboard",   label: "dashboard" },
-  { href: "/training",    label: "training" },
-  { href: "/melody",      label: "melody" },
+  { href: "/dashboard", label: "dashboard" },
+  { href: "/training", label: "training" },
+  { href: "/melody", label: "melody" },
   { href: "/melody/library", label: "library" },
   { href: "/leaderboard", label: "leaderboard" },
 ];
@@ -14,10 +15,16 @@ const navLinks = [
 export default function TopNav() {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
+  const profile = useUserProfile();
+
+  const isColorAvatar = profile.avatarUrl.startsWith("avatar_color:");
+  const isPhotoUrl = profile.avatarUrl && (profile.avatarUrl.startsWith("http://") || profile.avatarUrl.startsWith("https://") || profile.avatarUrl.startsWith("/"));
+  const avatarBg = isPhotoUrl ? "transparent" : (isColorAvatar ? profile.avatarUrl.split(":")[1] : "var(--accent)");
+  const initials = profile.username.substring(0, 2).toUpperCase();
 
   return (
     <nav
-      className="fixed top-0 w-full z-50 flex justify-between items-center px-6 h-14"
+      className="top-nav-layout fixed top-0 z-50 flex justify-between items-center px-6 h-14"
       style={{
         background: "var(--bg-surface)",
         borderBottom: "1px solid var(--bg-border)",
@@ -108,21 +115,43 @@ export default function TopNav() {
         ))}
 
         {/* Avatar */}
-        <div
+        <Link
+          href="/profile"
+          title={profile.provider !== "none" ? profile.username : "Log In / Sign Up"}
           style={{
             width: 30,
             height: 30,
             borderRadius: "50%",
-            background: "var(--bg-raised)",
+            background: avatarBg,
             border: "1px solid var(--bg-border)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             cursor: "pointer",
+            textDecoration: "none",
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: 11,
+            fontWeight: 700,
+            color: isColorAvatar ? "#0f1115" : "var(--bg)",
+            transition: "transform 0.15s",
           }}
+          onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.08)")}
+          onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
         >
-          <span className="material-symbols-outlined" style={{ fontSize: 16, color: "var(--accent)" }}>person</span>
-        </div>
+          {profile.provider !== "none" ? (
+            isPhotoUrl ? (
+              <img src={profile.avatarUrl} alt="profile" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
+            ) : (
+              initials
+            )
+          ) : (
+            isPhotoUrl ? (
+              <img src={profile.avatarUrl} alt="profile" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
+            ) : (
+              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>person</span>
+            )
+          )}
+        </Link>
       </div>
     </nav>
   );
